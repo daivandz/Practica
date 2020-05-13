@@ -10,6 +10,7 @@ using Control_inventario.Models;
 
 namespace Control_inventario.Controllers
 {
+    [Authorize]
     public class ProductsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -39,16 +40,16 @@ namespace Control_inventario.Controllers
         // GET: Products/Create
         public ActionResult Create()
         {
-            ViewBag.SupplirId = new SelectList(db.Suppliers, "Id", "SupplierCode");
+            ViewBag.SupplirId = new SelectList(db.Suppliers, "Id", "SupplierName");
             return View();
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        // Para protegerse de ataques de publicación excesiva, habilite las propiedades específicas a las que desea enlazarse. Para obtener 
+        // más información vea https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,ProductCode,ProductName,Description,Quantity,SupplirId")] Product product)
+        public ActionResult Create([Bind(Include = "Id,ProductCode,ProductName,Description,Quantity,Price,SupplirId")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -78,11 +79,11 @@ namespace Control_inventario.Controllers
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        // Para protegerse de ataques de publicación excesiva, habilite las propiedades específicas a las que desea enlazarse. Para obtener 
+        // más información vea https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,ProductCode,ProductName,Description,Quantity,SupplirId")] Product product)
+        public ActionResult Edit([Bind(Include = "Id,ProductCode,ProductName,Description,Quantity,Price,SupplirId")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -118,6 +119,12 @@ namespace Control_inventario.Controllers
             db.Products.Remove(product);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public ActionResult ProductBySupplier(int supplierId)
+        {
+            var products = db.Products.Where(p => p.SupplirId == supplierId).ToList();
+            return View(products);
         }
 
         protected override void Dispose(bool disposing)
